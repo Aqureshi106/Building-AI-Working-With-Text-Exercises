@@ -1,0 +1,21 @@
+text = '''he really really loves coffee
+my sister dislikes coffee
+my sister loves tea'''
+import math
+def main(text):
+    docs = [line.split() for line in text.splitlines()]
+    N = len(docs)
+    vocabulary = list(set(text.split()))
+    df = {}
+    tf = {}
+    for word in vocabulary:
+        tf[word] = [doc.count(word)/len(doc) for doc in docs]
+        df[word] = sum([word in doc for doc in docs])/N
+    for doc_index, doc in enumerate(docs):
+        tfidf = []
+        for word in vocabulary:
+            over_df = 1/(df[word])
+            log_df = math.log(over_df, 10)
+            tfidf.append(tf[word][doc_index] * log_df) 
+        print(tfidf)
+main(text)
