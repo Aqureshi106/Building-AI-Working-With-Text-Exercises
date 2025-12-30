@@ -1,0 +1,31 @@
+import numpy as np
+import math
+text = '''Humpty Dumpty sat on a wall
+Humpty Dumpty had a great fall
+all the king's horses and all the king's men
+couldn't put Humpty together again'''
+def main(text):
+    docs = [line.lower().split() for line in text.split('\n')]
+    N = len(docs)
+    vocabulary = list(set(word for doc in docs for word in doc))
+    tf = {}
+    df = {}
+    for word in vocabulary:
+        tf[word] = [doc.count(word) / len(doc) for doc in docs]
+        df[word] = sum(word in doc for doc in docs) / N
+    tfidf_vectors = []
+    for doc_index in range(N):
+        vec = []
+        for word in vocabulary:
+            idf = math.log(1 / df[word], 10)
+            vec.append(tf[word][doc_index] * idf)
+        tfidf_vectors.append(vec)
+    tfidf_vectors = np.array(tfidf_vectors)
+    dist = np.empty((N,N), dtype=float)
+    for i in range(N):
+        for j in range(N):
+            dist[i, j] = np.sum(np.abs(tfidf_vectors[i] - tfidf_vectors[j]))
+    np.fill_diagonal(dist, np.inf)
+    closest_pair = np.unravel_index(np.argmin(dist), dist.shape)
+    print(closest_pair)
+main(text)
